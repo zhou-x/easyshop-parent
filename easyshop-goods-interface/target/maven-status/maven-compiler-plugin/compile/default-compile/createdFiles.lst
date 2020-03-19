@@ -1,0 +1,8 @@
+com\easyshop\goods\service\SellerService.class
+com\easyshop\goods\service\SpecificationService.class
+com\easyshop\goods\service\ContentCategoryService.class
+com\easyshop\goods\service\ContentService.class
+com\easyshop\goods\service\BrandService.class
+com\easyshop\goods\service\TypeTemplateService.class
+com\easyshop\goods\service\SpecificationOptionService.class
+com\easyshop\goods\service\ItemCatService.class

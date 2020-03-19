@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>类型模板管理</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    
+    <link rel="stylesheet" href="../plugins/bootstrap/css/bootstrap.min.css" th:href="@{/plugins/bootstrap/css/bootstrap.min.css}" >
+    <link rel="stylesheet" href="../plugins/adminLTE/css/AdminLTE.css" th:href="@{/plugins/adminLTE/css/AdminLTE.css}">
+    <link rel="stylesheet" href="../plugins/adminLTE/css/skins/_all-skins.min.css" th:href="@{/plugins/adminLTE/css/skins/_all-skins.min.css}">
+    <link rel="stylesheet" href="../css/style.css" th:href="@{/css/style.css}">
+	<script src="../plugins/jQuery/jquery-2.2.3.min.js" th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.min.js" th:src="@{/plugins/bootstrap/js/bootstrap.min.js}"></script>
+    <script src="media/layui/layui.js" th:src="@{/media/layui/layui.js}"></script>
+    
+      <script type="text/javascript">
+       
+	    //跳转页码
+	    function goPage(pageIndex){
+	    	$("#typeTemplateForm").attr("action","/typeTemplate/list/"+pageIndex);
+			$("#typeTemplateForm").submit();
+	    }
+	    
+	    //查询所有的品牌和规格
+	    function getBrandsAndSpecifications(){
+	    	//异步查询
+	    	 $.get("/typeTemplate/getBrandsAndSpecifications", null, function(obj) {
+	    		 //alert(JSON.stringify(obj)); //把JSON字符串
+	    		 var brands=obj.brands;
+	    		 var brand_tr="";
+	    		 for(var i=0;i<brands.length;i++){
+	    			 var b=brands[i];
+	    			 if(i%6==5){
+	    				 brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;<br/>";
+	    			 }else{
+	    				 brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;"; 
+	    			 }
+	    			
+	    		 }
+	    		 $("#brand_add_td").html("");
+	    		 $("#brand_add_td").append(brand_tr);
+	    		 
+	    		 var specifications=obj.specifications;
+	    		 var specifications_tr="";
+	    		 for(var i=0;i<specifications.length;i++){
+	    			 var s=specifications[i];
+	    			 if(i%6==5){
+	    				 specifications_tr=specifications_tr+"<input type=\"checkbox\" name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;<br/>";
+	    			 }else{
+	    				 specifications_tr=specifications_tr+"<input type=\"checkbox\" name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;"; 
+	    			 }
+	    			
+	    		 }
+	    		 $("#specifications_add_td").html("");
+	    		 $("#specifications_add_td").append(specifications_tr);
+	    	 });
+	    }
+	    
+	    //新增一行扩展属性
+	    function row_add_add(){
+	    	$("#tbody_add_add").append("<tr><td><input class=\"form-control\" placeholder=\"属性名称\" name=\"custom_attribute_items\"></td><td><button type=\"button\" class=\"btn btn-default\" title=\"删除\" onclick=\"delete_Row(this);\"><i class=\"fa fa-trash-o\"></i> 删除</button></td></tr>");
+	    }
+	    
+	  //新增一行扩展属性
+	    function row_add_update(){
+	    	$("#update_kuozhan").append("<tr><td><input class=\"form-control\" placeholder=\"属性名称\" name=\"custom_attribute_items\"></td><td><button type=\"button\" class=\"btn btn-default\" title=\"删除\" onclick=\"delete_Row(this);\"><i class=\"fa fa-trash-o\"></i> 删除</button></td></tr>");
+	    }
+	    
+	    //删除一行
+	    //删除当前对应的行
+	    function delete_Row(btn){
+		    $(btn).parent().parent().remove();
+	    }
+	    
+	    //新增模板
+	    function add_typeTemplate(){
+	    	//异步提交 Ajax提交---异步提交表单
+	    	$.ajax({
+	    		url:"/typeTemplate/add",
+	    		type:"post",
+	    		dataType:"json",
+	    		data:$("#addForm").serialize(), //表单序列化  传值到后台
+	    		success:function(result){
+	    			layui.use('table', function() {
+						if(result.success==true){
+							layer.msg("新增成功", {icon : 6},function(){
+								window.location.reload();//刷新页面
+							});
+						}else{
+							layer.msg("新增失败", {icon : 5},function(){
+								window.location.reload();//刷新页面
+							});
+						}
+					});
+	    		}
+	    	});
+	    }
+	    
+	    
+	    //更新数据回显
+	    function getById(id){
+	    	//异步查询
+	    	 $.get("/typeTemplate/getById/"+id, null, function(obj) {
+	    		 //alert(JSON.stringify(obj)); //把JSON字符串
+	    		 
+	    		 var template=obj.template;
+	    		 $("#update_id").val(template.id);
+	    		 $("#update_name").val(template.name);
+	    		 
+	    		 
+	    		 var brands=obj.brands;
+	    		 var brand_tr="";
+	    		 for(var i=0;i<brands.length;i++){
+	    			 var b=brands[i];
+	    			 if(i%6==5){
+	    				 if(b.flag==true){
+	    					 brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" checked value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;<br/>";
+	    				 }else{
+	    					 brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;<br/>";
+	    				 }
+	    			 }else{
+	    				 if(b.flag==true){
+	    				    brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" checked value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;"; 
+	    				 }else{
+	    					brand_tr=brand_tr+"<input type=\"checkbox\" name=\"brand_ids\" value=\""+b.id+"\"/>"+b.name+"&nbsp;&nbsp;"; 
+	    				 }
+	    			 }
+	    			
+	    		 }
+	    		 $("#brand_update_td").html("");
+	    		 $("#brand_update_td").append(brand_tr);
+	    		 
+	    		 
+	    		 var specifications=obj.specifications;
+	    		 var specifications_tr="";
+	    		 for(var i=0;i<specifications.length;i++){
+	    			 var s=specifications[i];
+	    			 if(i%6==5){
+	    				 if(s.flag==true){
+	    				    specifications_tr=specifications_tr+"<input type=\"checkbox\" checked name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;<br/>";
+	    				 }else{
+	    					specifications_tr=specifications_tr+"<input type=\"checkbox\" name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;<br/>";
+	    				 }
+	    			 }else{
+	    				 if(s.flag==true){
+	    				   specifications_tr=specifications_tr+"<input type=\"checkbox\" checked name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;"; 
+	    				 }else{
+	    				   specifications_tr=specifications_tr+"<input type=\"checkbox\" name=\"specification_ids\" value=\""+s.id+"\"/>"+s.specName+"&nbsp;&nbsp;";
+	    				 }
+	    			 }
+	    			
+	    		 }
+	    		 $("#specifications_update_td").html("");
+	    		 $("#specifications_update_td").append(specifications_tr);
+	    		 
+	    		 //扩展属性
+	    		 var customAttributeItems=obj.customAttributeItems_object;
+	    		 var str="";
+	    		 for(var i=0;i<customAttributeItems.length;i++){
+	    			 var t=customAttributeItems[i].text;
+	    			 str=str+"<tr><td><input class=\"form-control\" name=\"custom_attribute_items\" placeholder=\"属性名称\" value=\""+t+"\" ></td><td><button type=\"button\" class=\"btn btn-default\" title=\"删除\" onclick=\"delete_Row(this);\"><i class=\"fa fa-trash-o\"></i> 删除</button></td></tr>";
+	    		 }
+	    		 $("#update_kuozhan").html("");
+	    		 $("#update_kuozhan").append(str);
+	    	 });
+	    }
+	    
+	    // 更新
+	    function updateTemplate(){
+	    	//异步提交 Ajax提交---异步提交表单
+	    	$.ajax({
+	    		url:"/typeTemplate/update",
+	    		type:"post",
+	    		dataType:"json",
+	    		data:$("#updateForm").serialize(), //表单序列化  传值到后台
+	    		success:function(result){
+	    			layui.use('table', function() {
+						if(result.success==true){
+							layer.msg("更新成功", {icon : 6},function(){
+								window.location.reload();//刷新页面
+							});
+						}else{
+							layer.msg("更新失败", {icon : 5},function(){
+								window.location.reload();//刷新页面
+							});
+						}
+					});
+	    		}
+	    	});
+	    }
+	    
+	 </script>
+    
+</head>
+
+<body class="hold-transition skin-red sidebar-mini" >
+  <!-- .box-body -->
+                
+                    <div class="box-header with-border">
+                        <h3 class="box-title">商品类型模板管理</h3>
+                    </div>
+
+                    <div class="box-body">
+
+                        <!-- 数据表格 -->
+                        <div class="table-box">
+
+                            <!--工具栏-->
+                            <div class="pull-left">
+                                <div class="form-group form-inline">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default" title="新建" data-toggle="modal" data-target="#addModal" onclick="getBrandsAndSpecifications()"><i class="fa fa-file-o"></i> 新建</button>
+                                        <button type="button" class="btn btn-default" title="删除"><i class="fa fa-trash-o"></i> 删除</button>
+                                       
+                                        <button type="button" class="btn btn-default" title="刷新" onclick="window.location.reload();"><i class="fa fa-refresh"></i> 刷新</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-tools pull-right">
+                               <form action="#" th:action="@{/typeTemplate/list/1}" method="post" id="typeTemplateForm">
+	                                <div class="has-feedback">
+								                  分类模板名称：<input  name="name" th:value="${pageResult.bean.name}">									
+										<button class="btn btn-default">查询</button>                                    
+	                                </div>
+                               </form>
+                               
+                            </div>
+                            <!--工具栏/-->
+
+			                  <!--数据列表-->
+			                  <table id="dataList" class="table table-bordered table-striped table-hover dataTable">
+			                      <thead>
+			                          <tr>
+			                              <th class="" style="padding-right:0px">
+			                                  <input id="selall" type="checkbox" class="icheckbox_square-blue">
+			                              </th> 
+										  <th class="sorting_asc">模板ID</th>
+									      <th class="sorting">分类模板名称</th>
+									      <th class="sorting">关联品牌</th>
+									      <th class="sorting">关联规格</th>									     
+									      <th class="sorting">扩展属性</th>													     						
+					                      <th class="text-center">操作</th>
+			                          </tr>
+			                      </thead>
+			                      <tbody>
+			                          <tr th:each="type_template:${pageResult.list}">
+			                              <td><input  type="checkbox"></td>			                              
+				                          <td th:text="${type_template.id}">1</td>
+									      <td th:text="${type_template.name}">手机</td>
+									      <td th:text="${type_template.brandIds}">联想,华为,中兴</td>
+									      <td th:text="${type_template.specIds}">网络制式</td>									 
+									      <td th:text="${type_template.customAttributeItems}"></td>		                                                                  
+		                                  <td class="text-center">                                           
+		                                 	  <button type="button" class="btn bg-olive btn-xs" data-toggle="modal" data-target="#editModal" th:onclick="|getById(${type_template.id});|">修改</button>
+		                                 	  <button type="button" class="btn bg-red btn-xs" data-toggle="modal" th:onclick="|deleteType_template(${type_template.id});|">删除</button>                                                                                    
+		                                  </td>
+			                          </tr>
+			                          
+			                      </tbody>
+			                  </table>
+			                  <!--数据列表/-->                        
+							   <!-- 添加分页的页码 -->
+			                  <!-- 分页组件 -->
+			                  <div class="row">
+			                	<div class="col-sm-6"><div class="dataTables_paginate paging_bootstrap" id="sample-table_paginate">
+			                	    <ul class="pagination">
+			                	      <li class="prev"><a href="#" th:onclick="|goPage(${pageResult.pageIndex-1})|">上一页</a></li>
+			                	      <li th:each="num:${pageResult.numbers}" th:class="${pageResult.pageIndex==num}? active"><a href="#" th:onclick="'goPage('+${num}+')'" th:text="${num}">1</a></li>
+			                	      <li class="next"><a href="#" th:onclick="|goPage(${pageResult.pageIndex+1})|">下一页</a></li>
+			                	    </ul>
+			                	 </div>
+			                	</div>
+			                   </div>
+			                 <!-- 分页组件 -->
+			                 <!-- 添加分页的页码 --> 
+							 
+                        </div>
+                        <!-- 数据表格 /-->
+                     </div>
+                    <!-- /.box-body -->
+<!-- 新增窗口 -->
+<form action="#" method="post" id="addForm">
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" >
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="myModalLabel">商品类型模板新增</h3>
+		</div>
+		<div class="modal-body">							
+			
+			<table class="table table-bordered table-striped"  width="800px">
+		      	<tr>
+		      		<td>模板名称</td>
+		      		<td><input  class="form-control" placeholder="模板名称" name="name">  </td>
+		      	</tr>			   
+		      	<tr>
+		      		<td>关联品牌</td>
+		      		<td id="brand_add_td">
+		      			
+		      		</td>
+		      	</tr>
+		      	<tr>
+		      		<td>关联规格</td>
+		      		<td id="specifications_add_td">
+	
+		      		</td>
+		      	</tr>	
+		      	
+		      	<tr>
+		      		<td>扩展属性</td>
+		      		<td>
+		      			<div class="btn-group">
+                             <button type="button" class="btn btn-default" title="新增扩展属性" onclick="row_add_add();"><i class="fa fa-file-o"></i> 新增扩展属性</button>
+                                                                    
+                        </div>
+						<table class="table table-bordered table-striped"  width="800px">
+							<thead>
+								<tr>
+									<td>属性名称</td>									
+									<td>操作</td>
+								</tr>
+							</thead>
+							<tbody id="tbody_add_add">
+								<tr>
+									<td><input class="form-control" placeholder="属性名称" name="custom_attribute_items"></td>
+									<td><button type="button" class="btn btn-default" title="删除" onclick="delete_Row(this);"><i class="fa fa-trash-o"></i> 删除</button></td>
+								</tr>
+								<tr>
+									<td><input class="form-control" placeholder="属性名称" name="custom_attribute_items"></td>
+									<td><button type="button" class="btn btn-default" title="删除" onclick="delete_Row(this);"><i class="fa fa-trash-o"></i> 删除</button></td>
+								</tr>
+							</tbody>
+						</table>	
+           
+		      		</td>
+		      	</tr>	
+		      	      
+			 </table>				
+			
+		</div>
+		<div class="modal-footer">						
+			<button class="btn btn-success" data-dismiss="modal" aria-hidden="true" onclick="add_typeTemplate();">新增</button>
+			<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</button>
+		</div>
+	  </div>
+	</div>
+</div>
+</form>					    
+                                
+<!-- 编辑窗口 -->
+<form action="#" method="post" id="updateForm">
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" >
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="myModalLabel">商品类型模板编辑</h3>
+		</div>
+		<div class="modal-body">							
+			
+			<table class="table table-bordered table-striped"  width="800px">
+		      	<tr>
+		      		<td>商品模板名称</td>
+		      		<td><input  class="form-control" placeholder="商品模板名称" name="name" id="update_name"/>
+		      		    <input  type="hidden" name="update_id" id="update_id"/>
+		      		</td>
+		      	</tr>			   
+		      	<tr>
+		      		<td>关联品牌</td>
+		      		<td id="brand_update_td">
+		      			
+		      		</td>
+		      	</tr>
+		      	<tr>
+		      		<td>关联规格</td>
+		      		<td id="specifications_update_td">
+	
+		      		</td>
+		      	</tr>	
+		      	
+		      	<tr>
+		      		<td>扩展属性</td>
+		      		<td>
+		      			<div class="btn-group">
+                             <button type="button" class="btn btn-default" title="新增扩展属性" onclick="row_add_update();"><i class="fa fa-file-o"></i> 新增扩展属性</button>
+                                                                    
+                        </div>
+						<table class="table table-bordered table-striped"  width="800px">
+							<thead>
+								<tr>
+									<td>属性名称</td>									
+									<td>操作</td>
+								</tr>
+							</thead>
+							<tbody id="update_kuozhan">
+								
+								
+							</tbody>
+						</table>	
+           
+		      		</td>
+		      	</tr>	
+		      	      
+			 </table>				
+			
+		</div>
+		<div class="modal-footer">						
+			<button class="btn btn-success" data-dismiss="modal" aria-hidden="true" onclick="updateTemplate();">更新</button>
+			<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</button>
+		</div>
+	  </div>
+	</div>
+</div>
+</form>
+
+</body>
+
+</html>

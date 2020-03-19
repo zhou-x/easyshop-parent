@@ -1,0 +1,11 @@
+com\easyshop\pojo\ContentCategory.class
+com\easyshop\pojo\PageResult.class
+com\easyshop\pojo\JsonObject.class
+com\easyshop\pojo\Result.class
+com\easyshop\pojo\Seller.class
+com\easyshop\pojo\SpecificationOption.class
+com\easyshop\pojo\TypeTemplate.class
+com\easyshop\pojo\Specification.class
+com\easyshop\pojo\ItemCat.class
+com\easyshop\pojo\Brand.class
+com\easyshop\pojo\Content.class

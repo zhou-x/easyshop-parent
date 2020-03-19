@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>模板引擎</title>
+</head>
+<body>
+   <h2 th:text="${name}">测试</h2>
+   
+   <h2 th:text="${#strings.length(name)}">测试</h2>
+   
+   <h2 th:text="${#strings.startsWith(name,'H')}">测试</h2>
+   
+   <h2 th:text="'Welcome to our application, ' + ${name} + '!'">测试数据</h2>
+   
+   <span th:text="|Welcome to our application, ${name}!|">测试数据</span>
+   
+   <h1 th:text="${age+1>20}">年龄</h1>
+   
+   <input type="button" value="按钮" >
+   
+   <h1 th:text="${#dates.createNow()}">当前时间</h1>
+   
+   <h1 th:text="${#dates.createToday()}">当前时间</h1>
+   
+   <h1 th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">当前时间</h1>
+   
+   <input type="text" value="测试" th:value="${name}"/>
+   
+   <h2 th:text="${name}"></h2>
+   
+</body>
+</html>

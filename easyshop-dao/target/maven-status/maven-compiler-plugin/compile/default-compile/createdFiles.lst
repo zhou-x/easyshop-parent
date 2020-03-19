@@ -1,0 +1,8 @@
+com\easyshop\mapper\ContentCategoryMapper.class
+com\easyshop\mapper\BrandMapper.class
+com\easyshop\mapper\SpecificationOptionMapper.class
+com\easyshop\mapper\SellerMapper.class
+com\easyshop\mapper\SpecificationMapper.class
+com\easyshop\mapper\ItemCatMapper.class
+com\easyshop\mapper\TypeTemplateMapper.class
+com\easyshop\mapper\ContentMapper.class

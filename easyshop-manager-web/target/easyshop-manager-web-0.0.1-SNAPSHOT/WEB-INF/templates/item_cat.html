@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品分类管理</title>
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../plugins/bootstrap/css/bootstrap.min.css" th:href="@{/plugins/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="../plugins/adminLTE/css/AdminLTE.css" th:href="@{/plugins/adminLTE/css/AdminLTE.css}">
+    <link rel="stylesheet" href="../plugins/adminLTE/css/skins/_all-skins.min.css" th:href="@{/plugins/adminLTE/css/skins/_all-skins.min.css}">
+    <link rel="stylesheet" href="../css/style.css" th:href="@{/css/style.css}">
+	<script src="../plugins/jQuery/jquery-2.2.3.min.js" th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.min.js" th:src="@{/plugins/bootstrap/js/bootstrap.min.js}"></script>
+    <script src="media/layui/layui.js" th:src="@{/media/layui/layui.js}"></script>
+    
+    <script type="text/javascript">
+	    //跳转页码
+	    function goPage(pageIndex){
+	    	$("#itemCatForm").attr("action","/itemCat/list/"+pageIndex);
+			$("#itemCatForm").submit();
+	    }
+	    
+	    //查询下一级分类
+	    function getChild(parentId){
+			$("#parentId").val(parentId); //把下一级的parentId存入表单中
+			
+			$("#itemCatForm").attr("action","/itemCat/list/1");
+			$("#itemCatForm").submit(); //提交表单
+		}
+	    
+	    //加载所有的模板 下拉框显示
+		function getType_templates(){
+			$.get("/itemCat/getType_templates", null, function(obj) {
+				 //alert(JSON.stringify(obj));
+				 var str="";
+				 $("#select_typeId").text(""); 
+				 for(var i=0;i<obj.length;i++){
+					 var id=obj[i].id;
+					 var name=obj[i].name;
+					 str=str+"<option value=\""+id+"\">"+name+"</option>";
+				 }
+				 $("#select_typeId").append(str);
+				 
+				 //把导航中的字摘取出来
+				 var a=$("#type_parent li:last").find("a");
+				 var templateName=a.text(); //最后一个导航名字取出来
+				 $("#templateName").text(templateName); //把名字放到界面上
+				 
+				 //获取标签中的parentId
+				 var href=a.prop("href");  // <li><a href="javascript:getChild(7);">音像</a></li>
+				 var parentId_val=href.substring(href.indexOf("(")+1,href.indexOf(")"));
+				 $("#parentId_val").val(parentId_val); //隐藏上级parentId
+				 
+				 //alert($("#parentId_val").val());
+			 });
+		}
+	    
+	    //新增分类
+	    //新增
+		function addItemCat(){
+			$.ajax({
+				url:"/itemCat/add",
+				type:"post",
+				dataType:"json",
+				data:$("#addForm").serialize(),  
+				success:function(result){
+					layui.use('table', function() {
+						if(result.success==true){
+							layer.msg("新增成功", {icon : 6},function(){
+								window.location.reload();//刷新页面
+							});
+						}else{
+							layer.msg("新增失败", {icon : 5},function(){
+								window.location.reload();//刷新页面
+							});
+						}
+					});
+				}
+			});
+		}
+	    
+	    //查询对象回显数据
+	    function getById(id){
+	    	 $.get("/itemCat/findOne/"+id, null, function(itemCat) {
+	    		 
+	    		 //把查询到的对象回显到更新的界面上
+				 $("#itemCat-id").val(itemCat.id); //隐藏值
+				 $("#itemCat-parentId").val(itemCat.parentId);
+				 $("#itemCat-name").val(itemCat.name);
+				 
+				 var a=$("#type_parent li:last").find("a");
+				 var templateName=a.text();
+				 $("#templateName_update").text(templateName);
+				 
+				 //加载下拉框模板
+				 $.get("/itemCat/getType_templates", null, function(obj) {
+					 //alert(JSON.stringify(obj));
+					 var str="";
+					 $("#select_typeId_update").text(""); 
+					 for(var i=0;i<obj.length;i++){
+						 var id=obj[i].id;
+						 var name=obj[i].name;
+						 str=str+"<option value=\""+id+"\">"+name+"</option>";
+					 }
+					 $("#select_typeId_update").append(str);
+					 
+					 $("#select_typeId_update").val(itemCat.typeId); //下拉框选中
+				 });
+				 
+			 });
+	    }
+	    
+	    //更新
+		function updateItemcat(){
+			$.ajax({
+				url:"/itemCat/update",
+				type:"post",
+				dataType:"json",
+				data:$("#updateForm").serialize(),  
+				success:function(result){
+					layui.use('table', function() {
+						if(result.success==true){
+							layer.msg("更新成功", {icon : 6},function(){
+								window.location.reload();//刷新页面
+							});
+						}else{
+							layer.msg("更新失败", {icon : 5},function(){
+								window.location.reload();//刷新页面
+							});
+						}
+					});
+				}
+			});
+		}
+	    
+		 //删除单个
+	    function deleteItemCat(id){
+	    	//异步删除
+	    	layui.use('table', function() {
+				   layer.confirm('是否确认删除该分类?',function(index) {
+					   $.ajax({
+							url:"/itemCat/delete/"+id,
+							type:"post",
+							dataType:"json",
+							success:function(result){
+								layui.use('table', function() {
+									if(result.success==true){
+										layer.msg("删除成功", {icon : 6},function(){
+											window.location.reload();//刷新页面
+										});
+									}else{
+										layer.msg("删除失败", {icon : 5},function(){
+											window.location.reload();//刷新页面
+										});
+									}
+								});
+							}
+						});
+				   });
+			});
+	    }
+		 
+		 
+	  //全选效果
+	    function ckAll(){
+	    	$("[name='ckChilds']").prop("checked",$("#selall").prop("checked"))
+	    }
+	    
+	    function child_click(){ 
+	    	var count=$("[name='ckChilds']").length; //总共子标签个数
+	    	var count2=$("[name='ckChilds']:checked").length; //选中的标签个数
+	    	if(count!=count2){
+	    		$("#selall").prop("checked",false);
+	    	}else{
+	    		$("#selall").prop("checked",true);
+	    	}
+	    }
+	  
+	    
+	    //批量删除
+	    function deleteSome(){
+	    	var ids=new Array();// 数组
+	    	//提示
+	    	//异步删除
+	    	layui.use('table', function() {
+	    	   var count=$("[name='ckChilds']:checked").length; //选中的标签个数
+	    	   if(count>0){
+	    		   layer.confirm('是否确认删除选中的分类?',function(index) {
+	 				  //执行删除的代码，获取要删除的id的集合
+	 				  var cks=$("[name='ckChilds']:checked");
+	 				  for(var i=0;i<cks.length;i++){
+	 					  var id=cks[i].value;//要删的id
+	 					 ids.push(id);//放入数组中
+	 				  }
+	 				 //发送异步
+	 				 $.ajax({
+	 		    		url:"/itemCat/deleteSome",
+	 		    		type:"post",
+	 		    		dataType:"json",
+	 		    		data:"ids="+ids, //发送的数据  34,56,89
+	 		    		success:function(result){
+	 		    			layui.use('table', function() {
+	 							if(result.success==true){
+	 								layer.msg("删除成功", {icon : 6},function(){
+	 									window.location.reload();//刷新页面
+	 								});
+	 							}else{
+	 								layer.msg("删除失败", {icon : 5},function(){
+	 									window.location.reload();//刷新页面
+	 								});
+	 							}
+	 						});
+	 		    		}
+	 		    	});
+	 				  
+				   }); 
+	    	   }else{
+	    		   layer.msg("请选中要删除的分类", {icon : 3});
+	    	   }
+			});
+	    }
+	    
+	</script>
+    
+</head>
+
+<body class="hold-transition skin-red sidebar-mini" >
+
+		       <!-- 表单 -->       
+		       <form action="#" th:action="@{/itemCat/list/1}" method="post" id="itemCatForm">
+		           <input type="hidden" name="parentId" id="parentId" th:value="${parentId}"/>
+		       </form>
+    
+               <!-- .box-body -->
+                    <div class="box-header with-border">
+                        <h3 class="box-title">商品分类管理     
+                       	</h3>
+                    </div>
+
+                    <div class="box-body">
+                  			 <ol class="breadcrumb" th:utext="${str}" id="type_parent">	                        	
+                        		<!--
+	                        		<li><a href="#" >顶级分类列表</a></li>
+			                        <li><a href="#" >珠宝</a></li>
+			                        <li><a href="#" >银饰</a></li> 
+		                        -->
+	                        </ol>
+
+                        <!-- 数据表格 -->
+                        <div class="table-box">
+							
+                            <!--工具栏-->
+                            <div class="pull-left">
+                                <div class="form-group form-inline">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default" title="新增" data-toggle="modal" data-target="#addModal" onclick="getType_templates();"><i class="fa fa-file-o"></i> 新增</button>
+                                        <button type="button" class="btn btn-default" title="删除"  onclick="deleteSome();" ><i class="fa fa-trash-o"></i> 删除</button>
+                                   		<button type="button" class="btn btn-default" title="刷新" onclick="window.location.reload();"><i class="fa fa-refresh"></i> 刷新</button>
+                                    </div>
+                                </div>
+                            </div>                          
+                       		
+                        
+			                <!--数据列表-->
+			                  <table id="dataList" class="table table-bordered table-striped table-hover dataTable">
+			                      <thead>
+			                          <tr>
+			                              <th class="" style="padding-right:0px">
+			                                  <input id="selall" onclick="ckAll();" type="checkbox" class="icheckbox_square-blue">
+			                              </th> 
+										  <th class="sorting_asc">分类ID</th>
+									      <th class="sorting">分类名称</th>									   
+									      <th class="sorting">类型模板ID</th>
+									     						
+					                      <th class="text-center">操作</th>
+			                          </tr>
+			                      </thead>
+			                      <tbody>
+			                      
+			                          <tr th:each="itemCat:${pageResult.list}">
+			                              <td><input  type="checkbox" th:value="${itemCat.id}" name="ckChilds" onclick="child_click();" /></td>			                              
+				                          <td th:text="${itemCat.id}">982</td>
+									      <td th:text="${itemCat.name}">吊坠/项链</td>									    
+									      <td th:text="${itemCat.typeId}">11</td>									      
+		                                  <td class="text-center">
+		                                      <button th:if="${not flag}" type="button" class="btn bg-olive btn-xs" th:onclick="'getChild('+${itemCat.id}+');'">查询下级</button> 		                                	                                     
+		                                 	  <button type="button" class="btn bg-olive btn-xs" data-toggle="modal" data-target="#editModal" th:onclick="'getById('+${itemCat.id}+');'">修改</button>                                           
+		                                 	  <button type="button" class="btn bg-red btn-xs" data-toggle="modal" th:onclick="|deleteItemCat(${itemCat.id});|">删除</button>
+		                                  </td>
+			                          </tr>
+									 
+			                      </tbody>
+			                  </table>
+			                  <!--数据列表/-->
+			                  <!-- 分页组件 -->
+			                  <div class="row">
+			                	<div class="col-sm-6"><div class="dataTables_paginate paging_bootstrap" id="sample-table_paginate">
+			                	    <ul class="pagination">
+			                	      <li class="prev"><a href="#" th:onclick="'goPage('+${pageResult.pageIndex-1}+')'">上一页</a></li>
+			                	      <li th:each="num:${pageResult.numbers}" th:class="${pageResult.pageIndex==num}? active"><a href="#" th:onclick="'goPage('+${num}+')'" th:text="${num}">1</a></li>
+			                	      <li class="next"><a href="#" th:onclick="'goPage('+${pageResult.pageIndex+1}+')'">下一页</a></li>
+			                	    </ul>
+			                	 </div>
+			                	</div>
+			                   </div>
+			                 <!-- 分页组件 -->                   
+                        </div>
+                        <!-- 数据表格 /-->
+                     </div>
+                    <!-- /.box-body -->
+                    
+<!-- 新增窗口 -->
+<form action="#" method="post" id="addForm">
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" >
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="myModalLabel">商品分类新增</h3>
+		</div>
+		<div class="modal-body">							
+			
+			<table class="table table-bordered table-striped"  width="800px">
+				<tr>
+		      		<td>上级商品分类</td>
+		      		<td>
+		      		   <input type="hidden" name="parentId" id="parentId_val"/>
+		      		   <span id="templateName"></span>
+		      		</td>
+		      	</tr>
+		      	<tr>
+		      		<td>商品分类名称</td>
+		      		<td><input  class="form-control" placeholder="商品分类名称" name="name"/>  </td>
+		      	</tr>			  
+		      	<tr>
+		      		<td>类型模板</td>
+		      		<td>	      		
+		      			<select id="select_typeId"  class="form-control" name="typeId">
+		      			
+		      			</select>
+		      		</td>		      		      		
+		      	</tr>		      	
+			 </table>				
+			
+		</div>
+		<div class="modal-footer">						
+			<button class="btn btn-success" data-dismiss="modal" aria-hidden="true" onclick="addItemCat();">新增</button>
+			<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</button>
+		</div>
+	  </div>
+	</div>
+</div>
+</form>
+
+                            
+<!-- 编辑窗口 -->
+<form action="#" id="updateForm" method="post">
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" >
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="myModalLabel">商品分类编辑</h3>
+		</div>
+		<div class="modal-body">							
+			
+			<table class="table table-bordered table-striped"  width="800px">
+				<tr>
+		      		<td>上级商品分类</td>
+		      		<td>
+		      		   <input type="hidden" name="id" id="itemCat-id"/>
+		      		   <input type="hidden" name="parentId" id="itemCat-parentId"/>
+		      		   <span id="templateName_update"></span>
+		      		</td>
+		      	</tr>
+		      	<tr>
+		      		<td>商品分类名称</td>
+		      		<td><input  class="form-control" placeholder="商品分类名称" name="name" id="itemCat-name"/></td>
+		      	</tr>			  
+		      	<tr>
+		      		<td>类型模板</td>
+		      		<td>	      		
+		      			<select class="form-control" name="typeId" id="select_typeId_update">
+		      			
+		      			</select>
+		      		</td>		      		      		
+		      	</tr>		      	
+			 </table>				
+			
+		</div>
+		<div class="modal-footer">						
+			<button class="btn btn-success" data-dismiss="modal" aria-hidden="true" onclick="updateItemcat();">保存</button>
+			<button class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</button>
+		</div>
+	  </div>
+	</div>
+</div>
+</form>
+
+</body>
+</html>

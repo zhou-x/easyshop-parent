@@ -1,0 +1,4 @@
+com\easyshop\controller\CodeController.class
+com\easyshop\controller\UserAuthorization.class
+com\easyshop\controller\SellerController.class
+com\easyshop\controller\ShopController.class

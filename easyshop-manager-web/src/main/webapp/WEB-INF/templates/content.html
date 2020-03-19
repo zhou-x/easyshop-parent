@@ -52,10 +52,10 @@
                 */
                 processData: false,
 				success:function(result){
-					alert(JSON.stringify(result));
+					//alert(JSON.stringify(result));
 					layui.use('table', function() {
 						if(result.success==true){
-							layer.msg("上传成功", {icon : 6},function(){
+							layer.msg("上传成功", {icon : 3},function(){
 								$("#upload_img_add").prop("src",result.message); //成功之后给src重新赋值  显示成功之后的图片地址
 								$("#upload_img_add_pic").val(result.message); //隐藏值
 							});

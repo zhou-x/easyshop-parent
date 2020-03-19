@@ -257,5 +257,6 @@
 		<module>easyshop-goods-service</module>
 		<module>easyshop-manager-web</module>
 		<module>easyshop-shop-web</module>
+		<module>easyshop-portal-web</module>
 	</modules>
 </project>

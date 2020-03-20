@@ -19,13 +19,34 @@ public class IndexController {
 
 	@RequestMapping({ "/index", "/index.html", "/" })
 	public String index(Model model) {
-		List<Content> lunBos = getLunBo();
-		model.addAttribute("lunBos", lunBos);
-		//查询轮播图
+		List<Content> lunBos = getLunBo();//查询轮播图
+		List<Content> shengXians = getShengXian();//查询生鲜
+		List<Content> shiPins = getShiPin();//查询食品
+		model.addAttribute("shengXians", shengXians);
+		model.addAttribute("lunBos", lunBos);	
+		model.addAttribute("shiPins", shiPins);
 		return "Index";
 	}
 	
+	
+	//查询轮播图
 	public List<Content> getLunBo(){
 		return contentService.selectList(new EntityWrapper<Content>().eq("del", 0).eq("status", 1).eq("category_id", 1));
 	}
+	
+	
+	//生鲜广告---查询数据库
+		public List<Content> getShengXian(){
+			return contentService.selectList(new EntityWrapper<Content>().eq("del", 0).eq("status", 1).eq("category_id", 7));
+			//System.err.println("生鲜广告图数据来源于数据库......");
+			//return shengxians;
+		}
+	
+		
+	//食品广告---查询数据库
+			public List<Content> getShiPin(){
+				return contentService.selectList(new EntityWrapper<Content>().eq("del", 0).eq("status", 1).eq("category_id", 8));
+				//System.err.println("生鲜广告图数据来源于数据库......");
+				//return shipins;
+			}
 }

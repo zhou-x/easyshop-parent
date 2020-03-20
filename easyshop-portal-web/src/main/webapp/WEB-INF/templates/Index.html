@@ -462,11 +462,11 @@
     	<div class="banner">    	
             <div class="top_slide_wrap">
 			    
-			    <!--轮播图-->
+			    <!--首页轮播图-->
                 <ul class="slide_box bxslider">
                     <li th:each="ad:${lunBos}"><img src="images/ban1.jpg" th:src="${ad.pic}" width="740" height="401" /></li>
                 </ul>
-                <!--轮播图-->	
+                <!--首页轮播图-->	
                 
                 <div class="op_btns clearfix">
                     <a href="#" class="op_btn op_prev"><span></span></a>
@@ -631,14 +631,14 @@
     	<div class="fresh_left">
         	<div class="fre_ban">
             	<div id="imgPlay1">
+            	    <!-- 进口生鲜广告区 -->
                     <ul class="imgs" id="actor1">
-                        <li><a href="#"><img src="images/fre_r.jpg" width="211" height="286" /></a></li>
-                        <li><a href="#"><img src="images/fre_r.jpg" width="211" height="286" /></a></li>
-                        <li><a href="#"><img src="images/fre_r.jpg" width="211" height="286" /></a></li>
+                        <!-- 循环生鲜广告 -->
+                        <li th:each="sx:${shengXians}"><a href="#" th:href="${sx.url}"><img src="images/fre_r.jpg" th:src="${sx.pic}" th:title="${sx.title}" width="211" height="286" /></a></li>
                     </ul>
                     <div class="prevf">上一张</div>
                     <div class="nextf">下一张</div> 
-                </div>   
+                </div>    
             </div>
             <div class="fresh_txt">
             	<div class="fresh_txt_c">
@@ -710,10 +710,10 @@
     	<div class="food_left">
         	<div class="food_ban">
             	<div id="imgPlay2">
+                    <!-- 食品饮料广告区 -->
                     <ul class="imgs" id="actor2">
-                        <li><a href="#"><img src="images/food_r.jpg" width="211" height="286" /></a></li>
-                        <li><a href="#"><img src="images/food_r.jpg" width="211" height="286" /></a></li>
-                        <li><a href="#"><img src="images/food_r.jpg" width="211" height="286" /></a></li>
+                         <!-- 循环食品饮料广告 -->
+                        <li th:each="sp:${shiPins}"><a href="#" th:href="${sp.url}"><img src="images/fre_r.jpg" th:src="${sp.pic}" th:title="${sp.title}" width="211" height="286" /></a></li>
                     </ul>
                     <div class="prev_f">上一张</div>
                     <div class="next_f">下一张</div> 
@@ -1275,7 +1275,7 @@
     </div>    
     <div class="btmbg">
 		<div class="btm">
-        	备案/许可证编号：蜀ICP备12009302号-1-www.dingguagua.com   Copyright © 2015-2018 尤洪商城网 All Rights Reserved. 复制必究 , Technical Support: Dgg Group <br />
+        	备案/许可证编号：鄂ICP备1200XXX号-1 Copyright © 2019-2020 网上易购商城网 All Rights Reserved. <br />
             <img src="images/b_1.gif" width="98" height="33" /><img src="images/b_2.gif" width="98" height="33" /><img src="images/b_3.gif" width="98" height="33" /><img src="images/b_4.gif" width="98" height="33" /><img src="images/b_5.gif" width="98" height="33" /><img src="images/b_6.gif" width="98" height="33" />
         </div>    	
     </div>
